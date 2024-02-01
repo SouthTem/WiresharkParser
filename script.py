@@ -9,7 +9,7 @@ import pandas as pd
 from collections import defaultdict
 
 lan_destination_ip = "^(192.168).*$" # checks if the numbers are 192.168. whatever values
-broadcast_ip = "^(255).*$" # if the starting is 255, indicating broadcast 
+broadcast_ip = ["^(255).*$", "^(238).*$"] # if the starting is 255, indicating broadcast 
 encrypted_data = ["HTTPS", "TLS", "TLSv1.2"] # encrypted protocols 
 non_encrypted_data = ["HTTP"] # non_encrypted protocol
 
@@ -40,7 +40,7 @@ def get_packet_details(packet):
     return [transport_layer, source_address, source_port, destination_address, destination_port, protocol] # return array of respected packet values
 
 def is_lan(pack):
-    if(re.search(lan_destination_ip, pack[1]) and re.search(lan_destination_ip, pack[3]) or (re.search(broadcast_ip, pack[1]) and re.search(broadcast_ip, pack[3]))): # checks if the source address and dest address are both within 192.168 range and broadcast
+    if(re.search(lan_destination_ip, pack[1]) and re.search(lan_destination_ip, pack[3]) or (re.search((i for i in broadcast_ip), pack[1]) and re.search((i for i in broadcast_ip), pack[3]))): # checks if the source address and dest address are both within 192.168 range and broadcast
         return True
     return False
 
