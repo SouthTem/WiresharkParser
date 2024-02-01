@@ -136,8 +136,7 @@ header_list = ["Filename", "lan_packets", "non_lan_packets", "overall_encrypted"
 with open('test.csv', 'wt', newline ='') as file:
     writer = csv.writer(file, delimiter=',')
     writer.writerow(i for i in header_list)
-    for j in final_list:
-        writer.writerow(j)
+    writer.writerow(i for i in final_list)
 
 # print(lan_packets)
 # print(non_lan_packets)
