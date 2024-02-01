@@ -4,6 +4,9 @@
 
 import pyshark 
 import re
+import csv
+import pandas as pd
+from collections import defaultdict
 
 lan_destination_ip = "^(192.168).*$" # checks if the numbers are 192.168. whatever values
 broadcast_ip = "^(255).*$" # if the starting is 255, indicating broadcast 
@@ -13,6 +16,7 @@ non_encrypted_data = ["HTTP"] # non_encrypted protocol
 
 def get_packet_details(packet):
     
+    packet_map = defaultdict("")
     if("ARP Layer" in str(packet.layers)):
         return ["","","","","",""]
     transport_layer = packet.transport_layer if(packet.transport_layer) else "" # get the protocol
@@ -126,6 +130,15 @@ overall_encrypted_LAN, overall_non_encrypted_LAN = encrypted_vs_nonencrypted_LAN
 overall_encrypted_non_LAN, overall_non_encrypted_non_LAN = encrypted_vs_nonencrypted_nonLAN(capture) # overall encrypted vs non encrypted non lan
 
 
+final_list = [lan_packets, non_lan_packets, overall_encrypted, overall_non_encrypted, overall_encrypted_LAN, overall_non_encrypted_LAN, overall_encrypted_non_LAN, overall_non_encrypted_non_LAN]
+header_list = ["Filename", "lan_packets", "non_lan_packets", "overall_encrypted","overall_non_encrypted","overall_encrypted_LAN", "overall_non_encrypted_LAN", "overall_encrypted_non_LAN", "overall_non_encrypted_non_LAN"]
+
+with open('test.csv', 'wt', newline ='') as file:
+    writer = csv.writer(file, delimiter=',')
+    writer.writerow(i for i in header_list)
+    for j in final_list:
+        writer.writerow(j)
+
 # print(lan_packets)
 # print(non_lan_packets)
 # print(overall_encrypted)
@@ -134,6 +147,7 @@ overall_encrypted_non_LAN, overall_non_encrypted_non_LAN = encrypted_vs_nonencry
 # print(overall_non_encrypted_LAN)
 # print(overall_encrypted_non_LAN)
 # print(overall_non_encrypted_non_LAN)
+
 
 
 
