@@ -5,18 +5,17 @@
 import pyshark 
 import re
 import csv
-import pandas as pd
 from collections import defaultdict
 
 lan_destination_ip = "^(192.168).*$" # checks if the numbers are 192.168. whatever values
-broadcast_ip = ["^(255).*$", "^(238).*$"] # if the starting is 255, indicating broadcast 
+broadcast_ip = "^(255)|(238).*$" # if the starting is 255, indicating broadcast. With "|", you can add more numbers to check if its a broadcast value
 encrypted_data = ["HTTPS", "TLS", "TLSv1.2"] # encrypted protocols 
 non_encrypted_data = ["HTTP"] # non_encrypted protocol
 
 
 def get_packet_details(packet):
     
-    packet_map = defaultdict("")
+    print("Getting packet details")
     if("ARP Layer" in str(packet.layers)):
         return ["","","","","",""]
     transport_layer = packet.transport_layer if(packet.transport_layer) else "" # get the protocol
@@ -37,10 +36,11 @@ def get_packet_details(packet):
                 protocol = i
 
     # print ([transport_layer, source_address, source_port, destination_address, destination_port, protocol])
+    print("Finished reciving packet details")
     return [transport_layer, source_address, source_port, destination_address, destination_port, protocol] # return array of respected packet values
 
 def is_lan(pack):
-    if(re.search(lan_destination_ip, pack[1]) and re.search(lan_destination_ip, pack[3]) or (re.search((i for i in broadcast_ip), pack[1]) and re.search((i for i in broadcast_ip), pack[3]))): # checks if the source address and dest address are both within 192.168 range and broadcast
+    if(re.search(lan_destination_ip, pack[1]) and re.search(lan_destination_ip, pack[3]) or (re.search(broadcast_ip, pack[1]) and re.search(broadcast_ip, pack[3]))): # checks if the source address and dest address are both within 192.168 range and broadcast
         return True
     return False
 
@@ -123,7 +123,7 @@ def encrypted_vs_nonencrypted_nonLAN(capture):
 
     return encrypted, non_encrypted     
 
-capture = pyshark.FileCapture('20231101T222157UTC.pcap')
+capture = pyshark.FileCapture('test.pcap')
 lan_packets, non_lan_packets = lan_vs_nonlan(capture) # lan and non lan packets
 overall_encrypted, overall_non_encrypted = encrypted_vs_nonencrypted(capture) # overall encryopted and non encrytped packets
 overall_encrypted_LAN, overall_non_encrypted_LAN = encrypted_vs_nonencrypted_LAN(capture) # overall encrypted vs non encrypted lan
